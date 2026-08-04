@@ -15,6 +15,10 @@ An end-to-end receipt extraction system combining **EasyOCR**, **LayoutLMv3** (t
 
 Runs entirely on **CPU with 8 GB RAM** — no GPU required.
 
+<p align="center">
+  <img src="assets/screenshot.png" alt="Streamlit Review UI" width="800">
+</p>
+
 ---
 
 ## Table of Contents
