@@ -15,9 +15,9 @@ An end-to-end receipt extraction system combining **EasyOCR**, **LayoutLMv3** (t
 
 Runs entirely on **CPU with 8 GB RAM** — no GPU required.
 
-<p align="center">
-  <video src="assets/Video.mp4" width="800" controls></video>
-</p>
+## Demo
+
+[![Watch the demo](https://img.youtube.com/vi/8DCDwmA6HUI/0.jpg)](https://www.youtube.com/watch?v=8DCDwmA6HUI)
 
 ---
 
