@@ -156,7 +156,7 @@ def _load_more():
 
 
 @st.fragment
-def _render_doc(doc):
+def _render_doc(doc, auto_open=False):
     extracted = doc.get("extracted_data") or {}
     conf = doc.get("overall_confidence") or 0.0
     status = doc.get("status", "pending")
@@ -193,7 +193,7 @@ def _render_doc(doc):
             unsafe_allow_html=True,
         )
 
-        with st.expander("Review details", expanded=False):
+        with st.expander("Review details", expanded=auto_open):
             col_img, col_data = st.columns([1, 2])
             with col_img:
                 stored_name = Path(doc.get("upload_path", "")).name
@@ -288,6 +288,8 @@ with st.sidebar:
                 result = _api_upload(uploaded_file)
             if result:
                 st.toast("Receipt uploaded!", icon="✅")
+                st.session_state.status_filter = result["status"]
+                st.session_state.auto_open_doc_id = result["id"]
                 _invalidate_cache()
                 st.rerun()
 
@@ -373,8 +375,9 @@ elif not docs:
 else:
     st.title(f"Documents · {status_label} ({len(docs)})")
 
+    auto_open_id = st.session_state.pop("auto_open_doc_id", None)
     for doc in docs:
-        _render_doc(doc)
+        _render_doc(doc, auto_open=doc["id"] == auto_open_id)
 
     if has_more:
         st.button(
