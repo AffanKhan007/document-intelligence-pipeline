@@ -24,9 +24,24 @@ st.markdown(
         border-right: 1px solid #e8ecf0;
     }
     [data-testid="stSidebar"] h1 {
-        font-size: 1.2rem !important;
+        font-size: 1.7rem !important;
         font-weight: 700 !important;
         color: #1a1a2e !important;
+    }
+
+    [data-testid="stSidebar"] p,
+    [data-testid="stSidebar"] label,
+    [data-testid="stSidebar"] .stCaptionContainer {
+        font-size: 1.05rem !important;
+    }
+    [data-testid="stSidebar"] .stButton > button {
+        font-size: 1.1rem !important;
+    }
+    [data-testid="stSidebar"] [data-testid="stMetricValue"] {
+        font-size: 1.5rem !important;
+    }
+    [data-testid="stSidebar"] [data-testid="stMetricLabel"] {
+        font-size: 1.05rem !important;
     }
 
     .stButton > button {
@@ -312,7 +327,7 @@ with st.sidebar:
             with c2:
                 st.metric("Avg Conf", f"{avg:.1%}" if avg is not None else "—")
 
-            for s in ["review", "approved", "verified", "pending"]:
+            for s in ["review", "approved", "verified"]:
                 count = by_status.get(s, 0)
                 badge = STATUS_BADGE.get(s, "")
                 st.markdown(
