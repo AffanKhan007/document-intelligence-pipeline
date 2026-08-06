@@ -17,7 +17,11 @@ Runs entirely on **CPU with 8 GB RAM** — no GPU required.
 
 ## Demo
 
-[![Watch the demo](https://img.youtube.com/vi/8DCDwmA6HUI/0.jpg)](https://www.youtube.com/watch?v=8DCDwmA6HUI)
+<p align="center">
+  <video src="https://raw.githubusercontent.com/AffanKhan007/document-intelligence-pipeline/main/assets/Video.mp4" width="800" controls></video>
+  <br>
+  <a href="assets/Video.mp4">Download the demo video</a>
+</p>
 
 ---
 
@@ -147,7 +151,8 @@ document-intelligence-pipeline/
 ├── .gitignore             # venv/, __pycache__/, receipts.db, uploads/*, training/, .env
 │
 ├── uploads/               # Uploaded receipt images (gitignored, created at runtime)
-└── training/              # Training scripts and notebooks (gitignored)
+├── training/              # Training scripts and notebooks (gitignored)
+└── assets/                # README media: screenshot.png, Video.mp4
 ```
 
 ---
@@ -161,7 +166,8 @@ document-intelligence-pipeline/
 | **31-label classification** | Full CORD schema: menu items, prices, totals, tax, subtotal |
 | **OCR confusion correction** | `parse_money()` normalizes common OCR errors (O→0, l→1, S→5, B→8) |
 | **Confidence-based routing** | `overall_confidence >= threshold` → auto-approved; below → review queue |
-| **HITL review UI** | Streamlit app with inline editing, dynamic item table, one-click approve |
+| **HITL review UI** | Streamlit app with inline editing, dynamic item table, one-click approve. After processing, the UI auto-navigates to the document's status section and opens its details |
+| **Responsive review UI** | 10 s cached API responses, lazy-loading detail panels, and Load-more pagination keep the UI snappy even with many documents |
 | **REST API** | FastAPI with auto-generated Swagger docs at `/docs` |
 | **SQLite persistence** | All documents, extractions, and human corrections stored locally |
 | **Docker support** | Containerized backend with CPU-only PyTorch (~1.5 GB image) |
@@ -198,7 +204,7 @@ document-intelligence-pipeline/
 | `id` | INTEGER | PRIMARY KEY, AUTOINCREMENT | Unique document ID |
 | `filename` | VARCHAR | NOT NULL | Original uploaded filename |
 | `upload_path` | VARCHAR | NOT NULL | Path to stored file (UUID-based) |
-| `status` | VARCHAR | DEFAULT 'pending' | `pending` → `review` / `approved` → `verified` |
+| `status` | VARCHAR | DEFAULT 'pending' | Upload sets `review` / `approved`; verify sets `verified` |
 | `extracted_json` | TEXT | | Full extraction result as JSON string |
 | `overall_confidence` | FLOAT | | Mean field-level confidence (0.0–1.0) |
 | `human_corrections` | TEXT | NULLABLE | Corrected data as JSON string (set on verify) |
@@ -207,8 +213,8 @@ document-intelligence-pipeline/
 
 **Status lifecycle:**
 ```
-pending ──(upload)──▶ review ──(verify)──▶ verified
-                   ▶ approved ──(verify)──▶ verified
+upload ──▶ review ──(verify)──▶ verified
+        ▶ approved ──(verify)──▶ verified
 ```
 
 ---
@@ -264,7 +270,7 @@ List documents with optional status filter and pagination.
 **Query Parameters:**
 | Param | Type | Default | Description |
 |---|---|---|---|
-| `status` | string | — | Filter: `review`, `approved`, `verified`, `pending` |
+| `status` | string | — | Filter: `review`, `approved`, `verified` |
 | `limit` | int | 100 | Max results (1–1000) |
 | `offset` | int | 0 | Pagination offset |
 
@@ -310,8 +316,7 @@ Aggregate statistics across all documents.
   "by_status": {
     "review": 12,
     "approved": 20,
-    "verified": 8,
-    "pending": 2
+    "verified": 8
   },
   "average_confidence": 0.83
 }
@@ -376,10 +381,12 @@ UPLOAD_DIR=./uploads
 ### 5. Start Backend
 
 ```bash
-uvicorn main:app --reload
+uvicorn main:app
 ```
 
 First run downloads the model (~350 MB) and EasyOCR weights (~100 MB) from HuggingFace Hub. This takes 2–5 minutes depending on internet speed. Subsequent starts are instant (model cached).
+
+**Note:** Use `uvicorn main:app --reload` only while developing the backend — `--reload` re-executes the app on every file change, which reloads the ~350 MB model each time.
 
 **Verify:** Open http://localhost:8000/docs — Swagger UI should load.
 
@@ -403,7 +410,7 @@ Open http://localhost:8501
 
 ### 8. Review & Correct
 
-Documents with confidence < 0.85 appear in the "review" queue. Edit fields inline, then click **Submit Corrections** or **Approve as-is**.
+Documents with confidence < 0.85 appear in the "review" queue. Edit fields inline, then click **Submit Corrections** or **Approve as-is**. After uploading, the UI automatically switches to the document's status section (`review` or `approved`) and opens its details.
 
 ---
 
@@ -561,7 +568,7 @@ The API has no authentication or authorization. CORS is wide open (`allow_origin
 
 ## License
 
-MIT — see [LICENSE](LICENSE) file.
+This project is licensed under the **MIT License**.
 
 ---
 
